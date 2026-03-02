@@ -32,7 +32,10 @@ public class NotificationService {
 
     @Transactional
     public void markAsRead(List<Long> notificationIds) {
-        List<NotificationEntity> notifications = notificationRepository.findByIdIn(notificationIds);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Long userId = (Long) authentication.getPrincipal();
+
+        List<NotificationEntity> notifications = notificationRepository.findByRegUserIdAndIdIn(userId, notificationIds);
 
         for (NotificationEntity notification: notifications) {
             notification.setRead(true);
