@@ -25,7 +25,7 @@ public class NotificationKafkaListener {
         this.repository = repository;
     }
 
-    @KafkaListener(topics = "${eventmanager.kafka.event-change-topic-name}", containerFactory = "containerFactory")
+    @KafkaListener(topics = "${eventnotificator.kafka.event-change-topic-name}", containerFactory = "containerFactory")
     @Transactional
     public void listenEvents(ConsumerRecord<Long, EventChangeMessage> kafkaMessage) {
         EventChangeMessage message = kafkaMessage.value();

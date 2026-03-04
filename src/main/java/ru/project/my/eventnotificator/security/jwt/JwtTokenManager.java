@@ -15,7 +15,7 @@ import javax.crypto.SecretKey;
 public class JwtTokenManager {
     private final SecretKey secretKey;
 
-    public JwtTokenManager(@Value("${eventmanager.jwt-secret-key}") String key) {
+    public JwtTokenManager(@Value("${eventnotificator.jwt-secret-key}") String key) {
         this.secretKey = Keys.hmacShaKeyFor(key.getBytes());
     }
 

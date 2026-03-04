@@ -15,7 +15,7 @@ public class ScheduledTasksService {
         this.notificationRepository = notificationRepository;
     }
 
-    @Scheduled(cron = "${eventmanager.delete-old-notifications-cron}")
+    @Scheduled(cron = "${eventnotificator.delete-old-notifications-cron}")
     @Transactional
     public void deleteOldNotifications() {
         notificationRepository.deleteOldNotifications(LocalDateTime.now().minusDays(7));
