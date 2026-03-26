@@ -5,11 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ru.project.my.eventnotificator.converters.NotificationEntityConverter;
 import ru.project.my.eventnotificator.kafka.model.EventChangeMessage;
-import ru.project.my.eventnotificator.repositories.NotificationRepository;
 import ru.project.my.eventnotificator.repositories.entity.NotificationEntity;
+import ru.project.my.eventnotificator.services.NotificationCounterService;
+import ru.project.my.eventnotificator.services.NotificationService;
 
 import java.util.List;
 
@@ -18,21 +18,26 @@ public class NotificationKafkaListener {
     static final Logger log = LoggerFactory.getLogger(NotificationKafkaListener.class.getName());
 
     private final NotificationEntityConverter converter;
-    private final NotificationRepository repository;
+    private final NotificationService notificationService;
+    private final NotificationCounterService notificationCounterService;
 
-    public NotificationKafkaListener(NotificationEntityConverter converter, NotificationRepository repository) {
+    public NotificationKafkaListener(NotificationEntityConverter converter, NotificationService notificationService, NotificationCounterService notificationCounterService) {
         this.converter = converter;
-        this.repository = repository;
+        this.notificationService = notificationService;
+        this.notificationCounterService = notificationCounterService;
     }
 
     @KafkaListener(topics = "${eventnotificator.kafka.event-change-topic-name}", containerFactory = "containerFactory")
-    @Transactional
     public void listenEvents(ConsumerRecord<Long, EventChangeMessage> kafkaMessage) {
         EventChangeMessage message = kafkaMessage.value();
         log.info("Из Кафки пришло сообщение: {}", message);
 
         List<NotificationEntity> notifications = converter.toEntity(message);
-        repository.saveAll(notifications);
+        notificationService.saveNotifications(notifications);
+
+        for (NotificationEntity notification: notifications) {
+            notificationCounterService.incrementUnread(notification.getRegUserId(), 1);
+        }
 
         log.info("Успешно обработано сообщение из Кафки: {}", message);
     }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import ru.project.my.eventnotificator.controllers.dto.NotificationCountDto;
 import ru.project.my.eventnotificator.controllers.dto.NotificationDto;
 import ru.project.my.eventnotificator.controllers.dto.NotificationReadDto;
 import ru.project.my.eventnotificator.converters.NotificationDtoConverter;
@@ -33,6 +34,16 @@ public class NotificationController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(dtoConverter.toDto(notifications));
+    }
+
+    @GetMapping("/notifications/count")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
+    public ResponseEntity<NotificationCountDto> getUserNotificationsCount() {
+        Long notificationsCount = notificationService.getUserNotificationsCount();
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(new NotificationCountDto(notificationsCount));
     }
 
     @PostMapping("/notifications")
