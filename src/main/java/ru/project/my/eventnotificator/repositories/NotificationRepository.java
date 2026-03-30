@@ -15,6 +15,8 @@ public interface NotificationRepository extends JpaRepository<NotificationEntity
 
     List<NotificationEntity> findByRegUserIdAndIdIn(Long userId, List<Long> ids);
 
+    long countByRegUserIdAndReadFalse(Long userId);
+
     @Modifying
     @Query("DELETE NotificationEntity n WHERE n.createDate <= :date")
     void deleteOldNotifications(@Param("date") LocalDateTime date);
